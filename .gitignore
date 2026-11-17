@@ -1,0 +1,7 @@
+﻿.venv/
+__pycache__/
+resultados/
+*.png
+corrigir_*.py
+diagnosticar_*.py
+cena_robo_astar_dwa.ttt
