@@ -256,7 +256,7 @@ def main():
     except Exception:
         existe = False
     if existe and not args.recriar:
-        print(f"[ERRO] A cena aberta ja tem {CENA['robo']}. Use --recriar para apagar e recriar.")
+        print(f"[ERRO] A cena aberta ja tem {CENA['robo']}.")
         return 2
     if args.recriar:
         apagar_existentes(sim)
@@ -273,18 +273,16 @@ def main():
     if resumo:
         d = resumo["deslocamento_m"]
         print(f"Motores : andou {d:.3f} m (esperado ~0.15 m) "
-              f"{'OK' if d > 0.05 else '-> NAO ANDOU, veja os avisos'}")
-        print(f"Frente  : o robo andou a {resumo['sentido_graus']:+.0f} graus do eixo yaw "
-              "(rode calibrar_robo.py --aplicar para gravar no config.py)")
+              f"{'OK' if d > 0.05 else 'NAO ANDOU'}")
+        print(f"Frente  : o robo andou a {resumo['sentido_graus']:+.0f} graus do eixo yaw")
         print(f"Camera  : {resumo['pixels_brancos']} px brancos (obstaculos), "
               f"{resumo['pixels_vermelhos']} px vermelhos (marcador do alvo) "
-              f"{'OK' if resumo['pixels_brancos'] > 500 and resumo['pixels_vermelhos'] > 20 else '-> CONFIRA A CAMERA'}")
+              f"{'OK' if resumo['pixels_brancos'] > 500 and resumo['pixels_vermelhos'] > 20 else 'FALHOU'}")
     if avisos:
-        print("\nAVISOS (passos que falharam; a cena pode precisar de ajuste manual):")
+        print("\nAVISOS:")
         for a in avisos:
             print("  -", a)
     print(f"\nCena salva em: {caminho}")
-    print("Proximo passo: python calibrar_robo.py --aplicar   e depois   python main_coppelia.py")
     return 0
 
 

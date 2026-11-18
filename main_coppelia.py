@@ -1,3 +1,8 @@
+"""Executa A* melhorado + DWA melhorado no CoppeliaSim (ZMQ Remote API, modo sincrono).
+
+Antes de rodar:  abra a cena no CoppeliaSim (a simulacao deve estar PARADA; o script a inicia).
+Uso:  python main_coppelia.py [--mostrar] [--saida resultados] [--vmax 0.12]
+"""
 import argparse
 import csv
 import math
@@ -16,6 +21,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 
 def ler_obstaculos(sim, sensores, alcance):
+    """Pontos detectados pelos 5 sensores, ja no referencial do mundo (Mx2)."""
     pts = []
     for h in sensores:
         res, dist, ponto, _, _ = sim.readProximitySensor(h)
@@ -26,6 +32,12 @@ def ler_obstaculos(sim, sensores, alcance):
 
 
 def detectar_orientacao(rgb, cpos, ortho, alvo):
+    """Acha o marcador VERMELHO do alvo na foto e descobre como a imagem se encaixa no mundo.
+
+    Testa troca de eixos e inversoes e escolhe a combinacao que leva o marcador para a
+    posicao real do /Target. Retorna (trocar, inv_x, inv_y) ou None se nao houver marcador
+    (nesse caso valem os valores de config.py).
+    """
     verm = (rgb[:, :, 0] > 180) & (rgb[:, :, 1] < 80) & (rgb[:, :, 2] < 80)
     if verm.sum() < 5:
         return None
@@ -49,13 +61,14 @@ def detectar_orientacao(rgb, cpos, ortho, alvo):
 
 
 def mover_cinematico(sim, robo, pos, yaw, v, w, dt):
+    """Integra a cinematica diferencial e teleporta o corpo (modo sem fisica)."""
     th = yaw + ROBO.offset_theta
     nova = [pos[0] + v * math.cos(th) * dt, pos[1] + v * math.sin(th) * dt, pos[2]]
     ori = [0.0, 0.0, yaw + w * dt]
     try:
         sim.setObjectPosition(robo, nova, sim.handle_world)
         sim.setObjectOrientation(robo, ori, sim.handle_world)
-    except Exception:
+    except Exception:  # noqa: BLE001  (assinatura antiga da API)
         sim.setObjectPosition(robo, sim.handle_world, nova)
         sim.setObjectOrientation(robo, sim.handle_world, ori)
 
@@ -106,7 +119,7 @@ def main():
     if args.vmax:
         ROBO.v_max = args.vmax
     if args.cinematico:
-        ROBO.offset_theta = 0.0
+        ROBO.offset_theta = 0.0      # na cena criada por criar_cena.py a frente e +x
 
     from coppeliasim_zmqremoteapi_client import RemoteAPIClient
     print("Conectando ao CoppeliaSim...")

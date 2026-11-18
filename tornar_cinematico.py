@@ -1,3 +1,11 @@
+"""Converte o robo da cena em modo CINEMATICO (sem fisica) e salva cena_cinematica.ttt.
+
+Todas as pecas do /Cuboid viram estaticas e nao-respondable; os joints viram cinematicos;
+a pose inicial e restaurada (0,6; 0,6; yaw 0). O main_coppelia.py --cinematico move o corpo
+pela cinematica diferencial. Sensores de proximidade, camera e alvo seguem normais.
+
+Uso:  python tornar_cinematico.py
+"""
 import math
 import os
 import sys
@@ -36,7 +44,7 @@ def main():
     try:
         sim.setObjectPosition(robo, pos, sim.handle_world)
         sim.setObjectOrientation(robo, ori, sim.handle_world)
-    except Exception:
+    except Exception:  # noqa: BLE001
         sim.setObjectPosition(robo, sim.handle_world, pos)
         sim.setObjectOrientation(robo, sim.handle_world, ori)
     print(f"{n_forma} pecas -> estaticas | {n_junta} joints -> cinematicos | pose inicial restaurada")

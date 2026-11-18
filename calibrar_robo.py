@@ -48,8 +48,6 @@ def main():
         dx, dy = p1[0] - p0[0], p1[1] - p0[1]
         desloc = math.hypot(dx, dy)
         print(f"\nReto: deslocou {desloc:.3f} m (esperado ~0.15 m)")
-        if desloc < 0.03:
-            print("  [AVISO] quase nao andou: confira os nomes dos motores / obstaculos na frente.")
         offset = norm(math.atan2(dy, dx) - yaw0)
         sugerido = round(offset / (math.pi / 2)) * (math.pi / 2)
         sugerido = math.pi if abs(abs(sugerido) - math.pi) < 1e-9 else sugerido
@@ -62,7 +60,7 @@ def main():
     finally:
         sim.stopSimulation()
 
-    print("\n=== Copie para config.py -> ParametrosRobo ===")
+    print()
     print(f"offset_theta: float = {sugerido:.5f}   # medido: {offset:.3f} rad "
           f"({math.degrees(offset):.1f} graus); atual = {ROBO.offset_theta:.5f}")
     print(f"sinal_w: float = {sinal:+.1f}          # atual = {ROBO.sinal_w:+.1f}")
@@ -75,8 +73,7 @@ def main():
         open(caminho, "w", encoding="utf-8").write(txt)
         print(f"\n[OK] config.py atualizado: offset_theta = {valor}, sinal_w = {sinal:+.1f}")
     if abs(norm(sugerido - offset)) > math.radians(20):
-        print("[AVISO] o offset medido nao e multiplo de 90 graus; usei o mais proximo. "
-              "Se o robo deriva, confira rodas/atrito.")
+        print("[AVISO] o offset medido nao e multiplo de 90 graus; usado o mais proximo.")
 
 
 if __name__ == "__main__":

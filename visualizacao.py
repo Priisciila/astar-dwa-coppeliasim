@@ -1,3 +1,6 @@
+import os
+import time
+
 import matplotlib
 
 plt = None
@@ -13,7 +16,13 @@ def preparar(mostrar=False):
 
 def _finalizar(fig, arquivo, mostrar):
     fig.tight_layout()
-    fig.savefig(arquivo, dpi=130)
+    try:
+        fig.savefig(arquivo, dpi=130)
+    except OSError:
+        base, ext = os.path.splitext(arquivo)
+        alternativo = f"{base}_{time.strftime('%H%M%S')}{ext}"
+        fig.savefig(alternativo, dpi=130)
+        print(f"[AVISO] {arquivo} esta aberto em outro programa; salvei em {alternativo}")
     if mostrar:
         plt.show()
     plt.close(fig)
